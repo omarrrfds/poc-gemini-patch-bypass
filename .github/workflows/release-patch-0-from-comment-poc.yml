@@ -1,0 +1,26 @@
+name: release-patch-0-from-comment-poc
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch-patch:
+    if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/patch') && github.event.comment.user.type == 'User'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get merge commit SHA
+        id: sha
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SHA=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json mergeCommit -q .mergeCommit.oid)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+      - name: Dispatch patch workflow
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run release-patch-1-prod-poc.yml --repo ${{ github.repository }} -f sha=${{ steps.sha.outputs.sha }}

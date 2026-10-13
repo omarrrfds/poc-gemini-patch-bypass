@@ -1,0 +1,21 @@
+name: release-patch-1-prod-poc
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        required: true
+        type: string
+
+environment: prod
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prove dispatch happened with attacker-supplied SHA
+        run: |
+          echo "PATCH-TRIGGERED-PROOF sha=${{ inputs.sha }} by=$(date -u)" | tee patch_proof.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: patch-proof
+          path: patch_proof.txt
