@@ -6,11 +6,10 @@ on:
         required: true
         type: string
 
-environment: prod
-
 jobs:
   patch:
     runs-on: ubuntu-latest
+    environment: prod
     steps:
       - name: Prove dispatch happened with attacker-supplied SHA
         run: |
